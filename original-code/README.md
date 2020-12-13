@@ -57,3 +57,8 @@ root@fe385569a625:/go/src/app# goose up
 ```
 root@fe385569a625:/go/src/app# go run main.go
 ```
+
+# 注意点
+
+・gorm のバージョンが古いと使用できない可能性があるため注意
+（ gorm.io/gorm v1.20.4 では使用できず、go.mod の内容を gorm.io/gorm v1.20.7 に手動で書き換えたらできた。）
