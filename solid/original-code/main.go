@@ -12,8 +12,9 @@ import (
 
 // User ...
 type User struct {
-	Name string `json:"name"`
-	Age  int    `json:"age"`
+	ID   uint   `json:"id" gorm:"id"`
+	Name string `json:"name" gorm:"name"`
+	Age  int    `json:"age" gorm:"age"`
 }
 
 // InitDB ...
@@ -36,8 +37,6 @@ func InitMiddleware(e *echo.Echo) {
 func InitRouting(e *echo.Echo, u *User) {
 	e.POST("user", u.CreateUser)
 	e.GET("user/:id", u.GetUser)
-	e.GET("users", u.GetUsers)
-	e.PUT("user/:id", u.UpdateUser)
 	e.DELETE("user/:id", u.DeleteUser)
 }
 
@@ -46,46 +45,47 @@ func (u *User) CreateUser(c echo.Context) error {
 	if err := c.Bind(u); err != nil {
 		return err
 	}
-	return c.String(http.StatusOK, "You are "+"Name:"+u.Name)
+
+	err := db.Create(&u).Error
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, u.ID)
 }
 
 // GetUser ...
 func (u *User) GetUser(c echo.Context) error {
 	id := c.Param("id")
-	return c.String(http.StatusOK, "You are "+id)
-}
-
-// GetUsers ...
-func (u *User) GetUsers(c echo.Context) error {
-	email := c.QueryParam("email")
-	return c.String(http.StatusOK, "You got All Users."+email)
-}
-
-// UpdateUser ...
-func (u *User) UpdateUser(c echo.Context) error {
-	return c.String(http.StatusOK, "Updated")
+	err := db.First(&u, id).Error
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, u)
 }
 
 // DeleteUser ...
 func (u *User) DeleteUser(c echo.Context) error {
-	return c.String(http.StatusOK, "Deleted")
+	if err := c.Bind(u); err != nil {
+		return err
+	}
+	err := db.Delete(&u).Error
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, "Deleted")
 }
 
+var db *gorm.DB
+
 func main() {
-	db := InitDB()
+	db = InitDB()
 
 	sqlDB, err := db.DB()
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer sqlDB.Close()
-	// defer func() {
-	// 	if db != nil {
-	// 		if err := db.Close(); err != nil {
-	// 			log.Fatal(err)
-	// 		}
-	// 	}
-	// }()
 
 	e := echo.New()
 
