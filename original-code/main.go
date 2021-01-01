@@ -57,7 +57,7 @@ func (u *User) CreateUser(c echo.Context) error {
 // GetUser ...
 func (u *User) GetUser(c echo.Context) error {
 	id := c.Param("id")
-	err := db.First(&u, id).Error
+	err := db.Where("id = ?", id).First(&u).Error
 	if err != nil {
 		return err
 	}
