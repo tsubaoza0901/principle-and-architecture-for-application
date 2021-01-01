@@ -38,7 +38,7 @@ Enter password:
 mysql> CREATE DATABASE originalcode;
 ```
 
-## 3．マイグレーションファイルの実行
+## 3．Go Modules の初期化
 
 ① アプリケーションコンテナ内へ移動
 
@@ -46,13 +46,23 @@ mysql> CREATE DATABASE originalcode;
 $ docker exec -it original-code bash
 ```
 
-② マイグレーションファイルの実行
+② go.mod ファイルの作成
+
+```
+root@fe385569a625: go mod init 任意のモジュール名
+```
+
+※上記のコマンド実行後、念の為ディレクトリ内に go.mod ファイルができていることを確認
+
+## 4．マイグレーションファイルの実行
+
+マイグレーションファイルの実行
 
 ```
 root@fe385569a625:/go/src/app# goose up
 ```
 
-## 4．アプリケーションの起動
+## 5．アプリケーションの起動
 
 ```
 root@fe385569a625:/go/src/app# go run main.go
